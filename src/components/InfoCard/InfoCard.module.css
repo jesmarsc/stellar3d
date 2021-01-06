@@ -1,0 +1,35 @@
+.InfoCard {
+  width: 32vw;
+  max-width: 442px;
+  min-width: 352px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.InfoCard__title {
+  margin: 0px 8px;
+}
+
+.InfoCard__name {
+  width: 100%;
+  font-size: 2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.InfoCard__country {
+  width: 100%;
+  font-size: 1.6rem;
+  line-height: 1.6rem;
+  display: flex;
+  align-items: center;
+}
+
+.InfoCard__divider {
+  margin: 8px 0px;
+  height: 4px;
+  border-radius: 2px;
+  border: none;
+}

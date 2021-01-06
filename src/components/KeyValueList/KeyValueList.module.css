@@ -1,0 +1,23 @@
+.list {
+  list-style: none;
+}
+
+.list__item {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  font-size: 1.6rem;
+}
+
+.list__itemKey {
+  font-weight: bolder;
+  min-width: max-content;
+  width: 40%;
+}
+
+.list__itemValue {
+  width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,0 +1,16 @@
+.Layout {
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+}
+
+.InfoCardPosition {
+  position: absolute;
+  bottom: 128px;
+  left: 64px;
+}
+
+.NavigationPosition {
+  position: fixed;
+  top: 0px;
+}

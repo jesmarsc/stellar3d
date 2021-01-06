@@ -1,0 +1,35 @@
+html {
+  overflow: hidden;
+  box-sizing: border-box;
+  font-size: 50%;
+}
+
+@media (min-width: 600px) {
+  html {
+    font-size: 56.25%;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 62.5%;
+  }
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+  text-decoration: none;
+  font-size: inherit;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  line-height: 1.6;
+  background-color: #000011;
+}
