@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { observer } from 'mobx-react';
-import { useTransition, animated, config } from 'react-spring';
+import { useTransition, animated, config } from '@react-spring/web';
 import { FaGlobeAmericas } from 'react-icons/fa';
 
 import { KeyValueList } from '@components';
@@ -11,30 +11,19 @@ import classes from './InfoCard.module.css';
 const InfoCard = observer(({ className }) => {
   const { selectedNode } = useContext(UIStateStoreContext);
 
-  const transitions = useTransition(selectedNode, selectedNode?.publicKey, {
-    from: { opacity: '0' },
-    enter: { opacity: '1' },
-    leave: { opacity: '0' },
+  const transitions = useTransition(selectedNode, {
+    key: selectedNode?.publicKey,
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
     config: config.stiff,
   });
 
-  return transitions.map(({ item, key, props }) => {
-    let entries = [];
-    if (item) {
-      entries = [
-        ['Public Key', item.publicKey],
-        ['IP:Port', `${item.ip}:${item.port}`],
-        ['Version', item.versionStr],
-        ['Overlay Version', item.overlayVersion],
-        ['Ledger Version', item.ledgerVersion],
-        ['ISP', item.isp],
-      ];
-    }
+  return transitions((style, item) => {
     return (
       item && (
         <animated.div
-          key={key}
-          style={props}
+          style={style}
           className={`${classes.InfoCard} ${className}`}
         >
           <div className={classes.InfoCard__title}>
@@ -54,7 +43,16 @@ const InfoCard = observer(({ className }) => {
               }, rgba(255, 255, 255, 0))`,
             }}
           />
-          <KeyValueList entries={entries} />
+          <KeyValueList
+            entries={[
+              ['Public Key', item.publicKey],
+              ['IP:Port', `${item.ip}:${item.port}`],
+              ['Version', item.versionStr],
+              ['Overlay Version', item.overlayVersion],
+              ['Ledger Version', item.ledgerVersion],
+              ['ISP', item.isp],
+            ]}
+          />
         </animated.div>
       )
     );

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useContext } from 'react';
+import { reaction } from 'mobx';
 import ForceGraph3D from '3d-force-graph';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import * as THREE from 'three';
@@ -19,12 +20,23 @@ const bloomPass = new UnrealBloomPass(
   bloomParams.threshold
 );
 
-let graph = null;
-let highlightLinks = new Set();
+const highlightLinkMaterial = new THREE.LineBasicMaterial({
+  linecap: 'round',
+  linejoin: 'round',
+  color: new THREE.Color(1, 0, 0),
+  opacity: 0.8,
+  transparent: true,
+});
 
-const updateHighlight = () => {
-  graph.linkWidth(graph.linkWidth());
-};
+const regularLinkMaterial = new THREE.LineBasicMaterial({
+  linecap: 'round',
+  linejoin: 'round',
+  color: new THREE.Color(1, 1, 1),
+  opacity: 0.04,
+  transparent: true,
+});
+
+let graph = null;
 
 const Three = () => {
   const canvasRef = useRef();
@@ -32,8 +44,26 @@ const Three = () => {
 
   useEffect(() => {
     uiContext.setLoading(true);
+
+    // REACTION TO UPDATE THE HIGHLIGHTED LINKS
+    const linkReactionCleanup = reaction(
+      () => uiContext.selectedNode,
+      (selectedNode, previousSelectedNode) => {
+        previousSelectedNode?.links.forEach(
+          (link) => (link.__lineObj.material = regularLinkMaterial)
+        );
+        selectedNode?.links.forEach(
+          (link) => (link.__lineObj.material = highlightLinkMaterial)
+        );
+      }
+    );
+
     getNodes().then((nodes) => {
-      const links = getLinks(nodes);
+      const nodesMap = nodes.reduce(
+        (map, node) => map.set(node.publicKey, node),
+        new Map()
+      );
+      const links = getLinks(nodes, nodesMap);
       graph = ForceGraph3D({ antialias: false, controlType: 'orbit' })(
         canvasRef.current
       )
@@ -42,26 +72,16 @@ const Three = () => {
         .nodeAutoColorBy((node) => node.organizationId)
         .nodeOpacity(1)
         .nodeRelSize(10)
-        .linkWidth((link) => (highlightLinks.has(link) ? 20 : 0))
-        .linkColor((link) =>
-          highlightLinks.has(link) ? 'rgba(255,255,255,1)' : 'white'
-        )
         .linkDirectionalParticles(1)
         .linkDirectionalParticleWidth(2)
         .linkDirectionalParticleSpeed(0.003)
         .linkOpacity(0.04)
+        .linkResolution(1)
         .onBackgroundClick(() => {
           uiContext.setSelectedNode(null);
-          highlightLinks.clear();
-          updateHighlight();
         })
         .onNodeClick((node) => {
-          if (node !== uiContext.selectedNode) highlightLinks.clear();
           uiContext.setSelectedNode(node);
-          for (const link of node.links) {
-            highlightLinks.add(link);
-          }
-          updateHighlight();
         })
         .cameraPosition({ x: 0, y: 0, z: 4000 })
         .enableNodeDrag(false)
@@ -85,7 +105,8 @@ const Three = () => {
     });
 
     return () => {
-      graph.graphData({ nodes: [], links: [] });
+      graph._destructor();
+      linkReactionCleanup();
     };
   }, [uiContext]);
 
