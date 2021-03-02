@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useContext } from 'react';
-import { reaction } from 'mobx';
+import { reaction, when } from 'mobx';
+import { observer } from 'mobx-react';
 import ForceGraph3D from '3d-force-graph';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import * as THREE from 'three';
 
-import { getNodes, getLinks } from '@utils/validators';
-import { UIStateStoreContext } from '@stores';
+import { UIStoreContext } from '@stores/UIStore';
+import { StellarStoreContext } from '@stores/StellarStore';
 
 const bloomParams = {
   strength: 8,
@@ -38,16 +39,17 @@ const regularLinkMaterial = new THREE.LineBasicMaterial({
 
 let graph = null;
 
-const Three = () => {
+const Three = observer(() => {
   const canvasRef = useRef();
-  const uiContext = useContext(UIStateStoreContext);
+  const uiStore = useContext(UIStoreContext);
+  const stellarStore = useContext(StellarStoreContext);
 
   useEffect(() => {
-    uiContext.setLoading(true);
-
+    uiStore.setLoading(true);
     // REACTION TO UPDATE THE HIGHLIGHTED LINKS
+
     const linkReactionCleanup = reaction(
-      () => uiContext.selectedNode,
+      () => uiStore.selectedNode,
       (selectedNode, previousSelectedNode) => {
         previousSelectedNode?.links.forEach(
           (link) => (link.__lineObj.material = regularLinkMaterial)
@@ -58,59 +60,57 @@ const Three = () => {
       }
     );
 
-    getNodes().then((nodes) => {
-      const nodesMap = nodes.reduce(
-        (map, node) => map.set(node.publicKey, node),
-        new Map()
-      );
-      const links = getLinks(nodes, nodesMap);
-      graph = ForceGraph3D({ antialias: false, controlType: 'orbit' })(
-        canvasRef.current
-      )
-        .nodeId('publicKey')
-        .nodeLabel((node) => node.name || node.publicKey)
-        .nodeAutoColorBy((node) => node.organizationId)
-        .nodeOpacity(1)
-        .nodeRelSize(10)
-        .linkDirectionalParticles(1)
-        .linkDirectionalParticleWidth(2)
-        .linkDirectionalParticleSpeed(0.003)
-        .linkOpacity(0.04)
-        .linkResolution(1)
-        .onBackgroundClick(() => {
-          uiContext.setSelectedNode(null);
-        })
-        .onNodeClick((node) => {
-          uiContext.setSelectedNode(node);
-        })
-        .cameraPosition({ x: 0, y: 0, z: 4000 })
-        .enableNodeDrag(false)
-        .warmupTicks(100)
-        .cooldownTime(0)
-        .onEngineStop(() => uiContext.setLoading(false));
+    graph = ForceGraph3D({ antialias: false, controlType: 'orbit' })(
+      canvasRef.current
+    )
+      .nodeId('publicKey')
+      .nodeLabel((node) => node.name || node.publicKey)
+      .nodeAutoColorBy((node) => node.organizationId)
+      .nodeOpacity(1)
+      .nodeRelSize(10)
+      .linkDirectionalParticles(1)
+      .linkDirectionalParticleWidth(2)
+      .linkDirectionalParticleSpeed(0.003)
+      .linkOpacity(0.04)
+      .linkResolution(1)
+      .onBackgroundClick(() => {
+        uiStore.setSelectedNode(null);
+      })
+      .onNodeClick((node) => {
+        uiStore.setSelectedNode(node);
+      })
+      .cameraPosition({ x: 0, y: 0, z: 4000 })
+      .enableNodeDrag(false)
+      .warmupTicks(100)
+      .cooldownTime(0);
 
-      /*
+    when(
+      () => !stellarStore.isLoading,
+      () => {
+        graph.graphData(stellarStore.graphData);
+        graph.onEngineStop(() => uiStore.setLoading(false));
+      }
+    );
+
+    /*
       graph.scene().background = new THREE.CubeTextureLoader()
-        .setPath(process.env.PUBLIC_URL + '/images/')
+        .setPath(process.env.PUBLIC_URL + '/images/'*)
         .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png']);
-      */
+    */
 
-      graph.graphData({ nodes, links });
+    graph.d3Force('link').distance(1048);
+    graph.d3Force('charge').strength(-2048);
+    graph.controls().enableDamping = true;
 
-      graph.d3Force('link').distance(1048);
-      graph.d3Force('charge').strength(-2048);
-      graph.controls().enableDamping = true;
-
-      graph.postProcessingComposer().addPass(bloomPass);
-    });
+    graph.postProcessingComposer().addPass(bloomPass);
 
     return () => {
       graph._destructor();
       linkReactionCleanup();
     };
-  }, [uiContext]);
+  }, [uiStore, stellarStore]);
 
   return <div ref={canvasRef} style={{ width: '100vw', height: '100vh' }} />;
-};
+});
 
 export default Three;

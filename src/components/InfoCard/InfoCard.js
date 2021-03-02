@@ -4,12 +4,12 @@ import { useTransition, animated, config } from '@react-spring/web';
 import { FaGlobeAmericas } from 'react-icons/fa';
 
 import { KeyValueList } from '@components';
-import { UIStateStoreContext } from '@stores';
+import { UIStoreContext } from '@stores/UIStore';
 
 import classes from './InfoCard.module.css';
 
 const InfoCard = observer(({ className }) => {
-  const { selectedNode } = useContext(UIStateStoreContext);
+  const { selectedNode } = useContext(UIStoreContext);
 
   const transitions = useTransition(selectedNode, {
     key: selectedNode?.publicKey,

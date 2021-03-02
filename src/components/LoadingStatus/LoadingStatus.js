@@ -2,11 +2,11 @@ import React, { useContext } from 'react';
 import { observer } from 'mobx-react';
 import { useTransition, animated, config } from 'react-spring';
 
-import { UIStateStoreContext } from '@stores';
+import { UIStoreContext } from '@stores/UIStore';
 import classes from './LoadingStatus.module.css';
 
 const LoadingStatus = observer(() => {
-  const { isLoading } = useContext(UIStateStoreContext);
+  const { isLoading } = useContext(UIStoreContext);
 
   const transition = useTransition(isLoading, {
     from: { opacity: 1 },
