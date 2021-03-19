@@ -33,3 +33,32 @@
   border-radius: 2px;
   border: none;
 }
+
+.InfoCard__publicKeyContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.InfoCard__publicKey {
+  flex-basis: 0px;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.InfoCard__copy {
+  cursor: pointer;
+  font-size: 2.5rem;
+  padding: 2px;
+  border-radius: 2px;
+  transition: background-color 100ms;
+}
+
+.InfoCard__copy:hover {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+.InfoCard__copy:active {
+  background-color: rgba(255, 255, 255, 0.15);
+}

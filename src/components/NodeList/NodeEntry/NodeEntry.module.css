@@ -1,0 +1,29 @@
+.NodeEntry {
+  color: white;
+  cursor: pointer;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-weight: bolder;
+  outline: none;
+  flex-grow: 1;
+  border-radius: 4px;
+  padding: 0px 8px;
+  transition: background-color 100ms;
+}
+
+.NodeEntry_statusIndicator {
+  padding: 5px;
+  border-radius: 50%;
+}
+
+.NodeEntry_name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.NodeEntry:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

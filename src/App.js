@@ -1,16 +1,17 @@
 import React from 'react';
-import { Three, Layout } from '@components';
+import { Canvas, Layout } from '@components';
 import { withUIStore } from '@stores/UIStore';
 import { withStellarStore } from '@stores/StellarStore';
+import { withLedgerStore } from '@stores/LedgerStore';
 
 import './App.css';
 
 function App() {
   return (
     <Layout>
-      <Three />
+      <Canvas />
     </Layout>
   );
 }
 
-export default withStellarStore(withUIStore(App));
+export default withLedgerStore(withStellarStore(withUIStore(App)));

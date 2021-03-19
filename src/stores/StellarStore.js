@@ -15,6 +15,7 @@ class StellarStore {
     makeObservable(this, {
       isLoading: observable,
       error: observable,
+      graphData: observable.shallow,
     });
 
     this.fetchNodes();

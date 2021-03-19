@@ -6,11 +6,21 @@
 
 .InfoCardPosition {
   position: absolute;
-  bottom: 128px;
+  bottom: 64px;
   left: 64px;
 }
 
 .NavigationPosition {
   position: fixed;
   top: 0px;
+}
+
+.NodeListPosition {
+  width: 32vw;
+  max-width: 442px;
+  min-width: 352px;
+  position: absolute;
+  top: 64px;
+  left: 64px;
+  height: 42vh;
 }
