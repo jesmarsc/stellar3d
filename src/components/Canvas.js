@@ -121,6 +121,11 @@ const Canvas = () => {
       .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png']);
     */
 
+    window.addEventListener('resize', () => {
+      graph.height(window.innerHeight);
+      graph.width(window.innerWidth);
+    });
+
     return () => {
       graph._destructor();
       linkHighlightCleanup();

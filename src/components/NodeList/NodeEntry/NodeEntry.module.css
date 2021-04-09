@@ -1,14 +1,14 @@
 .NodeEntry {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  gap: 16px;
   color: white;
   cursor: pointer;
   background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-weight: bolder;
   outline: none;
-  flex-grow: 1;
+  border: none;
+  font-weight: bolder;
   border-radius: 4px;
   padding: 0px 8px;
   transition: background-color 100ms;

@@ -1,5 +1,7 @@
 .list {
   list-style: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .list__item {
@@ -10,13 +12,15 @@
 }
 
 .list__itemKey {
+  flex-grow: 1;
+  flex-basis: 0px;
   font-weight: bolder;
   min-width: max-content;
-  width: 40%;
 }
 
 .list__itemValue {
-  width: 60%;
+  flex-grow: 2;
+  flex-basis: 0px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

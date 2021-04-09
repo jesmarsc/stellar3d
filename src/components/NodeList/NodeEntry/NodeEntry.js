@@ -7,13 +7,12 @@ const NodeEntry = ({ node }) => {
   const uiStore = useContext(UIStoreContext);
   const statusColor = node.active ? 'lime' : 'red';
 
+  const selectNode = () => {
+    uiStore.setSelectedNode(node);
+  };
+
   return (
-    <button
-      className={classes.NodeEntry}
-      onClick={() => {
-        uiStore.setSelectedNode(node);
-      }}
-    >
+    <button className={classes.NodeEntry} onClick={selectNode}>
       <div
         className={classes.NodeEntry_statusIndicator}
         style={{

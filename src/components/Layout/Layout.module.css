@@ -4,23 +4,44 @@
   width: 100vw;
 }
 
-.InfoCardPosition {
-  position: absolute;
-  bottom: 64px;
-  left: 64px;
-}
-
 .NavigationPosition {
   position: fixed;
   top: 0px;
 }
 
+.InfoCardPosition {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  top: 16px;
+}
+
 .NodeListPosition {
-  width: 32vw;
-  max-width: 442px;
-  min-width: 352px;
-  position: absolute;
-  top: 64px;
-  left: 64px;
-  height: 42vh;
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+}
+
+@media screen and (min-width: 500px) {
+  .InfoCardPosition {
+    width: 32vw;
+    min-width: 342px;
+    max-width: 442px;
+    bottom: 64px;
+    left: 64px;
+    top: auto;
+    right: auto;
+  }
+
+  .NodeListPosition {
+    width: 32vw;
+    height: 32vh;
+    min-width: 342px;
+    max-width: 442px;
+    top: 64px;
+    left: 64px;
+    bottom: auto;
+    right: auto;
+  }
 }

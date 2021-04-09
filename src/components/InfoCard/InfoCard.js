@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { observer } from 'mobx-react';
 import { useTransition, animated, config } from '@react-spring/web';
-import { FaRegCopy, FaGlobeAmericas } from 'react-icons/fa';
+import { FaGlobeAmericas } from 'react-icons/fa';
 
 import { KeyValueList } from '@components';
 import { UIStoreContext } from '@stores/UIStore';
@@ -45,20 +45,7 @@ const InfoCard = observer(({ className }) => {
           />
           <KeyValueList
             entries={[
-              [
-                'Public Key',
-                <div className={classes.InfoCard__publicKeyContainer}>
-                  <span className={classes.InfoCard__publicKey}>
-                    {item.publicKey}
-                  </span>
-                  <FaRegCopy
-                    className={classes.InfoCard__copy}
-                    onClick={() => {
-                      navigator.clipboard.writeText(item.publicKey);
-                    }}
-                  />
-                </div>,
-              ],
+              ['Public Key', item.publicKey],
               ['IP:Port', `${item.ip}:${item.port}`],
               ['Version', item.versionStr],
               ['Overlay Version', item.overlayVersion],
