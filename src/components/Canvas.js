@@ -46,7 +46,7 @@ let graph = ForceGraph3D({ antialias: false, controlType: 'orbit' })
   .linkOpacity(0.04)
   .linkResolution(1)
   .enableNodeDrag(false)
-  .warmupTicks(100)
+  .warmupTicks(50)
   .cooldownTicks(0)
   .cooldownTime(0);
 
@@ -102,65 +102,18 @@ const Canvas = () => {
 
     ledgerStore.addEventListener('spawnRocket', ({ detail: rocket }) => {
       graph.scene().add(rocket);
-      const { curve } = rocket;
-
-      const arriveAnimation = (time) => {
-        const worldDirection = new THREE.Vector3();
-        rocket.position.add(
-          rocket.getWorldDirection(worldDirection).multiplyScalar(400)
-        );
-
-        if (rocket.position.angleTo(curve.getPointAt(0)) < 0.01) {
-          rocket.arrived(time);
-          return;
-        }
-        requestAnimationFrame(arriveAnimation);
-      };
-      requestAnimationFrame(arriveAnimation);
     });
 
-    ledgerStore.addEventListener('removeRocket', ({ detail: rocket }) => {
-      let cleanUp = false;
-      const departAnimation = () => {
-        const worldDirection = new THREE.Vector3();
-        rocket.position.add(
-          rocket.getWorldDirection(worldDirection).multiplyScalar(400)
-        );
-
-        if (cleanUp) {
-          graph.scene().remove(rocket);
-          return;
-        }
-        requestAnimationFrame(departAnimation);
-      };
-      requestAnimationFrame(departAnimation);
-      setTimeout(() => (cleanUp = true), 1000);
-    });
-
-    const flyingAnimation = (time) => {
-      for (const rocket of ledgerStore.ledgers) {
-        const { curve, curveScaleMultiplier, arrivalTime } = rocket;
-        const elapsedTime = (time - arrivalTime) * 0.001;
-
-        const loopTime = 50;
-        const arcLength1 = (elapsedTime % loopTime) / loopTime;
-        const arcLength2 = ((elapsedTime + 0.1) % loopTime) / loopTime;
-
-        const position = curve
-          .getPointAt(arcLength1)
-          .multiplyScalar(curveScaleMultiplier);
-        const lookAtPosition = curve
-          .getPointAt(arcLength2)
-          .multiplyScalar(curveScaleMultiplier);
-
-        rocket.position.copy(position);
-        rocket.lookAt(lookAtPosition);
+    const animateRockets = (time) => {
+      for (const rocket of ledgerStore.rockets) {
+        rocket.animation(rocket, time);
       }
-
-      requestAnimationFrame(flyingAnimation);
+      for (const rocket of ledgerStore.departingRockets) {
+        rocket.animation(rocket);
+      }
+      requestAnimationFrame(animateRockets);
     };
-
-    requestAnimationFrame(flyingAnimation);
+    requestAnimationFrame(animateRockets);
 
     /*
     graph.scene().background = new THREE.CubeTextureLoader()

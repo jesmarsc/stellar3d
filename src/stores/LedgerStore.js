@@ -17,14 +17,16 @@ const curves = [
   new Curves.VivianiCurve(),
 ];
 
-const rocketScale = 20;
-const curveScaleMultiplier = 400;
+const rocketScale = 30;
+const curveScaleMultiplier = 700;
 const spawnDistance = 20000;
+const velocity = 40;
 
 class LedgerStore extends EventTarget {
   server = new StellarSdk.Server('https://horizon.stellar.org/');
-  rocket = new THREE.Object3D();
-  ledgers = [];
+  rocketModel = new THREE.Object3D();
+  rockets = [];
+  departingRockets = new Set();
 
   constructor() {
     super();
@@ -35,9 +37,9 @@ class LedgerStore extends EventTarget {
     loader
       .loadAsync(`${process.env.PUBLIC_URL}/assets/thrusterRocket.glb`)
       .then((gltf) => {
-        const rocket = gltf.scene.getObjectByName('Rocket');
-        rocket.scale.multiplyScalar(rocketScale);
-        this.rocket = rocket;
+        const rocketModel = gltf.scene.getObjectByName('Rocket');
+        rocketModel.scale.multiplyScalar(rocketScale);
+        this.rocketModel = rocketModel;
         this.server
           .ledgers()
           .cursor('now')
@@ -46,7 +48,7 @@ class LedgerStore extends EventTarget {
   };
 
   prepareRocket = (ledger) => {
-    const rocket = this.rocket.clone();
+    const rocket = this.rocketModel.clone();
     const curve = this.generateCurve(ledger.sequence);
     const [startPos, startDir] = this.generateSpawn(
       curve,
@@ -56,25 +58,34 @@ class LedgerStore extends EventTarget {
 
     rocket.position.copy(startPos);
     rocket.lookAt(startDir);
-    rocket.curve = curve;
-    rocket.curveScaleMultiplier = curveScaleMultiplier;
-    rocket.ledger = ledger;
+
+    Object.assign(rocket, { curve, curveScaleMultiplier, ledger });
+
     rocket.arrived = (time) => {
       rocket.arrivalTime = time;
-      this.addRocket(rocket);
+      rocket.animation = this.flyAnimation;
     };
 
-    this.dispatchEvent(new CustomEvent('spawnRocket', { detail: rocket }));
+    rocket.animation = this.arriveAnimation;
+    this.addRocket(rocket);
   };
 
   addRocket = (rocket) => {
-    if (this.ledgers.length >= 10) {
-      const removedRocket = this.ledgers.shift();
-      this.dispatchEvent(
-        new CustomEvent('removeRocket', { detail: removedRocket })
-      );
+    this.dispatchEvent(new CustomEvent('spawnRocket', { detail: rocket }));
+
+    if (this.rockets.length >= 7) {
+      const removedRocket = this.rockets.shift();
+      removedRocket.animation = this.departAnimation;
+      this.departingRockets.add(removedRocket);
+
+      setTimeout(() => {
+        this.departingRockets.delete(removedRocket);
+        const scene = removedRocket.parent;
+        scene.remove(removedRocket);
+      }, 1000);
     }
-    this.ledgers.push(rocket);
+
+    this.rockets.push(rocket);
   };
 
   generateCurve = (num) => {
@@ -89,6 +100,45 @@ class LedgerStore extends EventTarget {
     const startPos = endPos.add(direction.negate().multiplyScalar(distance));
 
     return [startPos, endPos2];
+  };
+
+  arriveAnimation = (rocket, time) => {
+    const { curve } = rocket;
+    const worldDirection = new THREE.Vector3();
+    rocket.position.add(
+      rocket.getWorldDirection(worldDirection).multiplyScalar(velocity * 10)
+    );
+
+    if (rocket.position.angleTo(curve.getPointAt(0)) < 0.01) {
+      rocket.arrived(time);
+      rocket.animation = this.flyAnimation;
+    }
+  };
+
+  flyAnimation = (rocket, time) => {
+    const { curve, curveScaleMultiplier, arrivalTime } = rocket;
+    const elapsedTime = (time - arrivalTime) * 0.001;
+
+    const loopTime = velocity;
+    const arcLength1 = (elapsedTime % loopTime) / loopTime;
+    const arcLength2 = ((elapsedTime + 0.1) % loopTime) / loopTime;
+
+    const position = curve
+      .getPointAt(arcLength1)
+      .multiplyScalar(curveScaleMultiplier);
+    const lookAtPosition = curve
+      .getPointAt(arcLength2)
+      .multiplyScalar(curveScaleMultiplier);
+
+    rocket.position.copy(position);
+    rocket.lookAt(lookAtPosition);
+  };
+
+  departAnimation = (rocket) => {
+    const worldDirection = new THREE.Vector3();
+    rocket.position.add(
+      rocket.getWorldDirection(worldDirection).multiplyScalar(velocity * 10)
+    );
   };
 }
 
