@@ -30,7 +30,7 @@ class StellarStore {
         const links = this.loadLinks(data, nodesMap);
 
         this.nodesMap = nodesMap;
-        this.graphData = { nodes: data, links };
+        runInAction(() => (this.graphData = { nodes: data, links }));
       })
       .catch((error) => (this.error = error))
       .finally(() => runInAction(() => (this.isLoading = false)));
