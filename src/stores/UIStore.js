@@ -3,7 +3,7 @@ import { makeAutoObservable, observable } from 'mobx';
 
 class UIStore {
   selectedNode = null;
-  isLoading = false;
+  isLoading = true;
 
   constructor() {
     makeAutoObservable(this, {

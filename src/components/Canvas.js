@@ -57,8 +57,6 @@ const Canvas = () => {
   const ledgerStore = useContext(LedgerStoreContext);
 
   useEffect(() => {
-    uiStore.setLoading(false);
-
     graph = graph(canvasRef.current)
       .onBackgroundClick(() => {
         uiStore.setSelectedNode(null);
