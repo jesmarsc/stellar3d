@@ -82,7 +82,7 @@ class LedgerStore extends EventTarget {
         this.departingRockets.delete(removedRocket);
         const scene = removedRocket.parent;
         scene.remove(removedRocket);
-      }, 1000);
+      }, 2000);
     }
 
     this.rockets.push(rocket);
@@ -106,7 +106,7 @@ class LedgerStore extends EventTarget {
     const { curve } = rocket;
     const worldDirection = new THREE.Vector3();
     rocket.position.add(
-      rocket.getWorldDirection(worldDirection).multiplyScalar(velocity * 10)
+      rocket.getWorldDirection(worldDirection).multiplyScalar(velocity * 20)
     );
 
     if (rocket.position.angleTo(curve.getPointAt(0)) < 0.01) {
@@ -137,7 +137,7 @@ class LedgerStore extends EventTarget {
   departAnimation = (rocket) => {
     const worldDirection = new THREE.Vector3();
     rocket.position.add(
-      rocket.getWorldDirection(worldDirection).multiplyScalar(velocity * 10)
+      rocket.getWorldDirection(worldDirection).multiplyScalar(velocity * 20)
     );
   };
 }
